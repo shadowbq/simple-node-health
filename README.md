@@ -3,6 +3,8 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/shadowbq/simple-node-health)](https://goreportcard.com/report/github.com/shadowbq/simple-node-health)
 [![GoDoc](https://godoc.org/github.com/shadowbq/simple-node-health?status.svg)](https://godoc.org/github.com/shadowbq/simple-node-health)
 
+The `simple-node-health` tool is a versatile Go-based utility designed to monitor the health of Linux systems by providing an easy-to-use HTTP server and command-line interface. It performs essential checks, such as monitoring EXT4 file systems for read-only status, conducting DNS queries, and reporting the overall status of the node. This tool is best utilized when coupled with monitoring tools like Uptime Kuma or other systems that can monitor states via web calls, allowing users to integrate these health checks into their broader monitoring setups and ensure real-time visibility into server performance and stability in production environments.
+
 ## Dev Prerequisites
 
 * Golang

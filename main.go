@@ -16,6 +16,25 @@ var (
 	Version string // set by the build process
 )
 
+// Function to convert multi-line string to JSON object
+func multiLineStringToJSON(input string) (string, error) {
+	// Split the input string by newlines to create a slice of strings
+	lines := strings.Split(strings.TrimSpace(input), "\n")
+
+	// Create a map to hold the JSON object
+	jsonObject := map[string][]string{
+		"response": lines,
+	}
+
+	// Convert the map to a JSON string
+	jsonBytes, err := json.MarshalIndent(jsonObject, "", "  ")
+	if err != nil {
+		return "", err
+	}
+
+	return string(jsonBytes), nil
+}
+
 func getStatus() map[string]string {
 	return map[string]string{"status": "ok"}
 }
@@ -46,7 +65,13 @@ func getDNS(domain string) (string, error) {
 		return "", fmt.Errorf("Error executing dig command: %v", err)
 	}
 
-	return string(output), nil
+	jsonOutput, err := multiLineStringToJSON(string(output))
+
+	if err != nil {
+		return "", fmt.Errorf("Error: %v", err)
+	}
+
+	return string(jsonOutput), nil
 }
 
 // Function to return JSON status
