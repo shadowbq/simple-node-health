@@ -1,5 +1,5 @@
 [Unit]
-Description=EXT4 Check Service
+Description=Simple Node Health Service
 After=network.target
 
 [Service]
