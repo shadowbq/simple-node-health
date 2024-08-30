@@ -10,7 +10,7 @@
 ## Usage
 
 ```shell
-./simple-node-health --help
+$> ./simple-node-health --help
 A simple tool to check hardware EXT4 devices and run DNS queries
 
 Usage:
@@ -18,6 +18,7 @@ Usage:
   simple-node-health [command]
 
 Available Commands:
+  check       Run various checks
   completion  Generate the autocompletion script for the specified shell
   help        Help about any command
   settings    Print the current configuration settings
@@ -33,18 +34,26 @@ Use "simple-node-health [command] --help" for more information about a command.
 
 Inspect its default settings
 
-```
+```shell
 ./simple-node-health settings
 	domain: cloudflare.com
 	verbose: false
 	port: 8080
 ```
 
+Run the DNS example
+
+```shell
+./simple-node-health check checkdns
+104.16.132.229
+104.16.133.229
+```
+
 ## Build
 
 ```shell
-Make
-Product Version 1.0.0
+make
+Product Version 1.0.1
 
 Checking Build Dependencies ---->
 
@@ -52,10 +61,21 @@ Cleaning Build ---->
 rm -f -rf pkg/*
 rm -f -rf build/*
 rm -f -rf tmp/*
+rm -f -rf support/usr/local/bin/*
 
 Building ---->
-env GOOS=linux GOARCH=amd64 go build -ldflags "-X github.com/shadowbq/simple-node-health/cmd.Version=1.0.0 " -o build/simple-node-health_linux_amd64 main.go
-env GOOS=darwin GOARCH=amd64 go build -ldflags "-X github.com/shadowbq/simple-node-health/cmd.Version=1.0.0 " -o build/simple-node-health_darwin_amd64 main.go
+env GOOS=linux GOARCH=amd64 go build -ldflags "-X github.com/shadowbq/simple-node-health/cmd.Version=1.0.1 " -o build/simple-node-health_linux_amd64 main.go
+env GOOS=darwin GOARCH=amd64 go build -ldflags "-X github.com/shadowbq/simple-node-health/cmd.Version=1.0.1 " -o build/simple-node-health_darwin_amd64 main.go
+
+Packaging ---->
+cp build/simple-node-health_linux_amd64 support/usr/local/bin/simple-node-health
+# Replace {{VERSION}} in the control template with the actual version
+sed 's/{{VERSION}}/1.0.1/g' support/DEBIAN/control.tpl > support/DEBIAN/control
+chmod 0644 support/DEBIAN/control
+# Build the .deb package
+dpkg-deb --build support
+dpkg-deb: building package 'simple-node-health' in 'support.deb'.
+mv support.deb build/simple-node-health_1.0.1_amd64.deb
 ```
 
 ## Support - Running as a Service
