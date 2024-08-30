@@ -24,7 +24,7 @@ _testmain.go
 /build/
 /pkg/
 
-supprt/DEBIAN/control
+support/DEBIAN/control
 
 tmp
 locallog.txt
