@@ -47,8 +47,12 @@ Run the DNS example
 
 ```shell
 ./simple-node-health check checkdns
-104.16.132.229
-104.16.133.229
+{
+  "response": [
+    "104.16.133.229",
+    "104.16.132.229"
+  ]
+}
 ```
 
 ## Build
