@@ -58,7 +58,7 @@ package:
 	chmod 0644 $(CONTROL_FILE)
 	# Build the .deb package
 	dpkg-deb --build $(BUILD_DIR)
-	mv $(BUILD_DIR).deb $(PACKAGE_NAME)_$(VERSION)_amd64.deb
+	mv $(BUILD_DIR).deb build/$(PACKAGE_NAME)_$(VERSION)_amd64.deb
 
 ifndef PACKAGE_VERSION
 	@echo "\033[1;33mPACKAGE_VERSION is not set. In order to build a package I need PACKAGE_VERSION=n\033[m"

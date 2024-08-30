@@ -40,7 +40,7 @@ func getDisks() ([]string, error) {
 }
 
 func getDNS(domain string) (string, error) {
-	cmd := exec.Command("dig", domain)
+	cmd := exec.Command("dig", "+short", domain)
 	output, err := cmd.Output()
 	if err != nil {
 		return "", fmt.Errorf("Error executing dig command: %v", err)
