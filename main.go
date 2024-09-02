@@ -35,15 +35,32 @@ func multiLineStringToJSON(input string) (string, error) {
 	return string(jsonBytes), nil
 }
 
+// Function to convert a []string to a JSON object
+func stringArrayToJSON(input []string) (string, error) {
+	// Create a map with the key "response" and value as the input slice
+	jsonObject := map[string][]string{
+		"response": input,
+	}
+
+	// Convert the map to a JSON string with indentation
+	jsonBytes, err := json.MarshalIndent(jsonObject, "", "  ")
+	if err != nil {
+		return "", err
+	}
+
+	// Return the JSON string
+	return string(jsonBytes), nil
+}
+
 func getStatus() map[string]string {
 	return map[string]string{"status": "ok"}
 }
 
-func getDisks() ([]string, error) {
+func getDisks() (string, error) {
 	cmd := exec.Command("mount")
 	output, err := cmd.Output()
 	if err != nil {
-		return nil, fmt.Errorf("Error executing mount command: %v", err)
+		return "", fmt.Errorf("Error executing mount command: %v", err)
 	}
 
 	lines := strings.Split(string(output), "\n")
@@ -55,7 +72,14 @@ func getDisks() ([]string, error) {
 		}
 	}
 
-	return results, nil
+	//return results, nil
+
+	jsonOutput, err := stringArrayToJSON(results)
+	if err != nil {
+		return "", fmt.Errorf("Error: %v", err)
+	}
+
+	return jsonOutput, nil
 }
 
 func getDNS(domain string) (string, error) {
@@ -138,12 +162,7 @@ func runCheckDisks(cmd *cobra.Command, args []string) {
 		fmt.Println("Error checking Disks:", err)
 		return
 	}
-	output, err := json.Marshal(response)
-	if err != nil {
-		fmt.Println("Error encoding response:", err)
-		return
-	}
-	fmt.Println(string(output))
+	fmt.Print(response)
 }
 
 // Function to print check DNS to console
@@ -152,10 +171,6 @@ func runCheckDNS(cmd *cobra.Command, args []string) {
 	response, err := getDNS(domain)
 	if err != nil {
 		fmt.Println("Error checking DNS:", err)
-		return
-	}
-	if err != nil {
-		fmt.Println("Error encoding response:", err)
 		return
 	}
 	fmt.Print(response)
@@ -226,21 +241,21 @@ func main() {
 
 	// Subcommand: checkstatus
 	var checkStatusCmd = &cobra.Command{
-		Use:   "checkstatus",
+		Use:   "status",
 		Short: "Check the service status",
 		Run:   runCheckStatus,
 	}
 
 	// Subcommand: checkdisks
 	var checkDisksCmd = &cobra.Command{
-		Use:   "checkdisks",
+		Use:   "disks",
 		Short: "Check EXT4 devices for read-only mode",
 		Run:   runCheckDisks,
 	}
 
 	// Subcommand: checkdns
 	var checkDNSCmd = &cobra.Command{
-		Use:   "checkdns",
+		Use:   "dns",
 		Short: "Run a DNS query for the specified domain",
 		Run:   runCheckDNS,
 	}

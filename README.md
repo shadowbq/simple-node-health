@@ -46,7 +46,7 @@ Inspect its default settings
 Run the DNS example
 
 ```shell
-./simple-node-health check checkdns
+./simple-node-health check dns
 {
   "response": [
     "104.16.133.229",
@@ -59,7 +59,7 @@ Run the DNS example
 
 ```shell
 make
-Product Version 1.0.1
+Product Version 1.0.2
 
 Checking Build Dependencies ---->
 
@@ -70,18 +70,18 @@ rm -f -rf tmp/*
 rm -f -rf support/usr/local/bin/*
 
 Building ---->
-env GOOS=linux GOARCH=amd64 go build -ldflags "-X github.com/shadowbq/simple-node-health/cmd.Version=1.0.1 " -o build/simple-node-health_linux_amd64 main.go
-env GOOS=darwin GOARCH=amd64 go build -ldflags "-X github.com/shadowbq/simple-node-health/cmd.Version=1.0.1 " -o build/simple-node-health_darwin_amd64 main.go
+env GOOS=linux GOARCH=amd64 go build -ldflags "-X github.com/shadowbq/simple-node-health/cmd.Version=1.0.2 " -o build/simple-node-health_linux_amd64 main.go
+env GOOS=darwin GOARCH=amd64 go build -ldflags "-X github.com/shadowbq/simple-node-health/cmd.Version=1.0.2 " -o build/simple-node-health_darwin_amd64 main.go
 
 Packaging ---->
 cp build/simple-node-health_linux_amd64 support/usr/local/bin/simple-node-health
 # Replace {{VERSION}} in the control template with the actual version
-sed 's/{{VERSION}}/1.0.1/g' support/DEBIAN/control.tpl > support/DEBIAN/control
+sed 's/{{VERSION}}/1.0.2/g' support/DEBIAN/control.tpl > support/DEBIAN/control
 chmod 0644 support/DEBIAN/control
 # Build the .deb package
 dpkg-deb --build support
 dpkg-deb: building package 'simple-node-health' in 'support.deb'.
-mv support.deb build/simple-node-health_1.0.1_amd64.deb
+mv support.deb build/simple-node-health_1.0.2_amd64.deb
 ```
 
 ## Support - Running as a Service
