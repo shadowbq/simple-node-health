@@ -72,6 +72,11 @@ func getDisks() (string, error) {
 		}
 	}
 
+	// Check if the slice is nil and assign [""] if it is
+	if results == nil {
+		results = []string{""}
+	}
+
 	//return results, nil
 
 	jsonOutput, err := stringArrayToJSON(results)
@@ -271,13 +276,13 @@ func main() {
 	cobra.CheckErr(viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose")))
 	viper.SetDefault("verbose", false)
 
+	// Domain flag
+	rootCmd.PersistentFlags().StringVarP(&domain, "domain", "d", "cloudflare.com", "Domain to query with dig")
+	viper.BindPFlag("domain", rootCmd.PersistentFlags().Lookup("domain"))
+
 	// Port flag
 	rootCmd.Flags().IntVarP(&port, "port", "p", 8080, "Port for the web server")
 	viper.BindPFlag("port", rootCmd.Flags().Lookup("port"))
-
-	// Domain flag
-	rootCmd.Flags().StringVarP(&domain, "domain", "d", "cloudflare.com", "Domain to query with dig")
-	viper.BindPFlag("domain", rootCmd.Flags().Lookup("domain"))
 
 	// Bind environment variables
 	viper.AutomaticEnv()
