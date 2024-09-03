@@ -1,5 +1,5 @@
 #!make
-.PHONY: check-tools reportVersion depend clean build package all
+.PHONY: check-tools reportVersion depend clean build package all test
 .DEFAULT: all
 .EXPORT_ALL_VARIABLES:
 
@@ -22,6 +22,7 @@ BUILD_DOCS := README.md LICENSE example_config.yml
 OS := $(shell uname)
 
 all: check-tools reportVersion depend clean build package
+test: check-tools reportVersion depend clean build 
 
 check-tools:
 	@command -v dpkg-deb >/dev/null 2>&1 || { echo >&2 "dpkg-deb is required but it's not installed. Aborting."; exit 1; }

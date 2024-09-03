@@ -34,3 +34,8 @@ broken_*
 test.trace
 
 .env
+
+config.yaml
+snh-config.yaml
+
+audit.log

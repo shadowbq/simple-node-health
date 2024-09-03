@@ -20,10 +20,12 @@ Usage:
   simple-node-health [command]
 
 Available Commands:
-  check       Run various checks
-  completion  Generate the autocompletion script for the specified shell
-  help        Help about any command
-  settings    Print the current configuration settings
+  check         Run various checks
+  completion    Generate the autocompletion script for the specified shell
+  create-client Create a new client_id and client_secret and append them to the config file
+  help          Help about any command
+  settings      Print the current configuration settings
+  show-routes   Show all registered HTTP routes
 
 Flags:
   -d, --domain string   Domain to query with dig (default "cloudflare.com")
@@ -55,11 +57,56 @@ Run the DNS example
 }
 ```
 
+## Web OAUTH2 Tokens
+
+This web application is designed to be used with OAUTH2 tokens. It has a built-in token request endpoint and a token check endpoint. The `/token` request endpoint can be used to request a token with a `client_id` and `client_secret`. 
+
+The token `/check` endpoint can be used to check the validity of the token. Use the header `Authorization: Bearer <access_token>` when make calls to any of the secured endpoints. 
+
+
+```shell
+$> curl -X POST -d "client_id=81573e4c363622a6&client_secret=85e26051190016e5f3edb9d15c9803a9" http://localhost:8080/token
+```
+
+```json
+{"access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiI4MTU3M2U0YzM2MzYyMmE2IiwiZXhwIjoxNzI1Mzg3MTQ1fQ.f0OVB8ehLvDgak4-JcrHI-vblrkV9YLJpnmnJKFQSJY", "token_type": "Bearer", "expires_in": 3600} 
+```
+
+```shell
+$> curl -H "Authorization: Bearer not-a-real-token" http://localhost:8080/check
+Unauthorized: Invalid token
+```
+
+```shell
+$> curl -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiI4MTU3M2U0YzM2MzYyMmE2IiwiZXhwIjoxNzI1Mzg3MTQ1fQ.f0OVB8ehLvDgak4-JcrHI-vblrkV9YLJpnmnJKFQSJY" http://localhost:8080/check
+```
+
+```json
+{"status":"ok"}
+```
+
+## Web 
+
+Self document the URL routes that are available 
+
+```json
+$> ./simple-node-health show-routes
+{
+  "routes": [
+    "/",
+    "/check",
+    "/check/disks",
+    "/check/dns",
+    "/token"
+  ]
+}
+```
+
 ## Build
 
 ```shell
 make
-Product Version 1.0.2
+Product Version 1.5.0
 
 Checking Build Dependencies ---->
 
