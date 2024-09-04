@@ -8,9 +8,10 @@ import (
 	"os"
 	"sort"
 
-	_ "github.com/shadowbq/simple-node-health/commonutils"
-	_ "github.com/shadowbq/simple-node-health/oauth"
-	_ "github.com/shadowbq/simple-node-health/parsers"
+	"github.com/shadowbq/simple-node-health/audit"
+	"github.com/shadowbq/simple-node-health/helpers"
+	"github.com/shadowbq/simple-node-health/oauth"
+	"github.com/shadowbq/simple-node-health/parsers"
 	"github.com/spf13/cobra"
 )
 
@@ -60,7 +61,7 @@ func showRoutesCmd() *cobra.Command {
 		Short: "Show all registered HTTP routes",
 		Run: func(cmd *cobra.Command, args []string) {
 			initConfig()
-			commonutils.initAuditLogger()
+			audit.InitAuditLogger()
 			initURLHandlers()
 			if routes == nil {
 				fmt.Println("No routes available. Please initialize the server first.")
@@ -72,7 +73,7 @@ func showRoutesCmd() *cobra.Command {
 				return
 			}
 			sort.Strings(routes)
-			routes = commonutils.removeDuplicatesFromSlice(routes)
+			routes = helpers.RemoveDuplicatesFromSlice(routes)
 
 			// Create the response object
 			response := RoutesResponse{
@@ -97,15 +98,15 @@ func showRoutesCmd() *cobra.Command {
 func initURLHandlers() {
 
 	unprotectedMux := NewRouteTrackingMux()
-	unprotectedMux.HandleFunc("/token", oauth.tokenHandler)
+	unprotectedMux.HandleFunc("/token", oauth.TokenHandler)
 
 	mux := NewRouteTrackingMux()
-	mux.HandleFunc("/", parsers.checkStatus)
-	mux.HandleFunc("/check", parsers.checkStatus)
-	mux.HandleFunc("/check/disks", parsers.checkDisks)
-	mux.HandleFunc("/check/dns", parsers.checkDNS)
+	mux.HandleFunc("/", parsers.HTTPCheckStatus)
+	mux.HandleFunc("/check", parsers.HTTPCheckStatus)
+	mux.HandleFunc("/check/disks", parsers.HTTPCheckDisks)
+	mux.HandleFunc("/check/dns", parsers.HTTPCheckDNS)
 
-	secureMux := oauth.tokenAuthMiddleware(mux)
+	secureMux := oauth.TokenAuthMiddleware(mux)
 
 	// Combine both muxes into a single handler
 	mainMux = NewRouteTrackingMux()
@@ -122,7 +123,7 @@ func initURLHandlers() {
 }
 
 func runServer(port int) {
-	//auditLog(fmt.Sprintf("Starting server on port %d...\n", port))
+	audit.AuditLog(fmt.Sprintf("Starting server on port %d...\n", port))
 	log.Printf("Starting server on port %d...\n", port)
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), mainMux); err != nil {
 		log.Fatalf("Server failed to start: %v", err)

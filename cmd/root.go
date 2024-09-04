@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"os"
 
-	_ "github.com/shadowbq/simple-node-health/commonutils"
+	"github.com/shadowbq/simple-node-health/audit"
+	"github.com/shadowbq/simple-node-health/oauth"
 	_ "github.com/shadowbq/simple-node-health/oauth"
+	"github.com/shadowbq/simple-node-health/parsers"
 	_ "github.com/shadowbq/simple-node-health/parsers"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -22,20 +24,20 @@ var rootCmd = &cobra.Command{
 	Use:   "simple-node-health",
 	Short: "A simple tool to check hardware EXT4 devices and run DNS queries",
 	Run: func(cmd *cobra.Command, args []string) {
-		commonutils.initConfig()
-		commonutils.initAuditLogger()
-		commonutils.initURLHandlers()
-		commonutils.runServer(port)
+		initConfig()
+		audit.InitAuditLogger()
+		initURLHandlers()
+		runServer(port)
 	},
 }
 
-var prepCmd = &cobra.Command{
-	Use:   "prep",
-	Short: "perp",
+var CreateClientCmd = &cobra.Command{
+	Use:   "create-client",
+	Short: "Create a new client_id and client_secret and append them to the config file",
 	Run: func(cmd *cobra.Command, args []string) {
-		createClient := oauth.createClientCmd()
+		createClient := oauth.CreateClientInternalCmd()
 		initConfig()
-		commonutils.initAuditLogger()
+		audit.InitAuditLogger()
 		createClient.Run(createClient, args)
 	},
 }
@@ -48,12 +50,11 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.AddCommand(settingsCmd)
 
-	rootCmd.AddCommand(prepCmd)
+	rootCmd.AddCommand(CreateClientCmd)
 
-	// Add the command to generate and append a new client
-	rootCmd.AddCommand(oauth.createClientCmd())
+	// The Create Client Comand needs to be init so CreateClientInternalCmd is wrapped by CreateClientCmd
+	// rootCmd.AddCommand(oauth.CreateClientInternalCmd())
 
 	// Add the command to show all registered routes
 	rootCmd.AddCommand(showRoutesCmd())
@@ -68,21 +69,21 @@ func init() {
 	var checkStatusCmd = &cobra.Command{
 		Use:   "status",
 		Short: "Check the service status",
-		Run:   parsers.runCheckStatus,
+		Run:   parsers.CmdCheckStatus,
 	}
 
 	// Subcommand: checkdisks
 	var checkDisksCmd = &cobra.Command{
 		Use:   "disks",
 		Short: "Check EXT4 devices for read-only mode",
-		Run:   parsers.runCheckDisks,
+		Run:   parsers.CmdCheckDisks,
 	}
 
 	// Subcommand: checkdns
 	var checkDNSCmd = &cobra.Command{
 		Use:   "dns",
 		Short: "Run a DNS query for the specified domain",
-		Run:   parsers.runCheckDNS,
+		Run:   parsers.CmdCheckDNS,
 	}
 
 	// Add subcommands to the check command

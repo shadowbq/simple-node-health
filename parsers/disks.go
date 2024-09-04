@@ -7,7 +7,7 @@ import (
 	"os/exec"
 	"strings"
 
-	_ "github.com/shadowbq/simple-node-health/commonutils"
+	"github.com/shadowbq/simple-node-health/helpers"
 	"github.com/spf13/cobra"
 )
 
@@ -34,7 +34,7 @@ func getDisks() (string, error) {
 
 	//return results, nil
 
-	jsonOutput, err := commonutils.stringArrayToJSON(results)
+	jsonOutput, err := helpers.StringArrayToJSON(results)
 	if err != nil {
 		return "", fmt.Errorf("Error: %v", err)
 	}
@@ -43,7 +43,7 @@ func getDisks() (string, error) {
 }
 
 // Function to check for EXT4 devices in read-only mode
-func checkDisks(w http.ResponseWriter, r *http.Request) {
+func HTTPCheckDisks(w http.ResponseWriter, r *http.Request) {
 	results, err := getDisks()
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error checking disks: %v\n", err), http.StatusInternalServerError)
@@ -55,7 +55,7 @@ func checkDisks(w http.ResponseWriter, r *http.Request) {
 }
 
 // Function to print check disks to console
-func runCheckDisks(cmd *cobra.Command, args []string) {
+func CmdCheckDisks(cmd *cobra.Command, args []string) {
 	response, err := getDisks()
 	if err != nil {
 		fmt.Println("Error checking Disks:", err)

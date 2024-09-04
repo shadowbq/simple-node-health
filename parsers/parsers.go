@@ -13,14 +13,14 @@ func getStatus() map[string]string {
 }
 
 // Function to return JSON status
-func checkStatus(w http.ResponseWriter, r *http.Request) {
+func HTTPCheckStatus(w http.ResponseWriter, r *http.Request) {
 	response := getStatus()
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
 
 // Function to print check status to console
-func runCheckStatus(cmd *cobra.Command, args []string) {
+func CmdCheckStatus(cmd *cobra.Command, args []string) {
 	response := getStatus()
 	output, err := json.Marshal(response)
 	if err != nil {

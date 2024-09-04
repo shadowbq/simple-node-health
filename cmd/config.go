@@ -3,7 +3,13 @@ package cmd
 import (
 	"log"
 
+	"github.com/shadowbq/simple-node-health/oauth"
 	"github.com/spf13/viper"
+)
+
+var (
+	authTokenSecret string
+	clients         []oauth.Client
 )
 
 // Function to initialize the configuration for Viper

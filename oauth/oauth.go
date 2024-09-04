@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/shadowbq/simple-node-health/audit"
 )
 
 type Client struct {
@@ -21,10 +22,11 @@ type Claims struct {
 }
 
 var clients []Client
+
 var authTokenSecret string
 
 // Function GenerateJWT creates a new JWT token
-func generateJWT(clientID string) (string, error) {
+func generateJWT(clientID string, authTokenSecret string) (string, error) {
 	// Define your claims
 	claims := jwt.MapClaims{
 		"client_id": clientID,
@@ -54,7 +56,7 @@ func validateClientCredentials(clientID, clientSecret string) bool {
 }
 
 // Function to handle Token and call generator for JWT token
-func tokenHandler(w http.ResponseWriter, r *http.Request) {
+func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	clientID := r.FormValue("client_id")
 	clientSecret := r.FormValue("client_secret")
 
@@ -63,14 +65,14 @@ func tokenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := generateJWT(clientID)
+	token, err := generateJWT(clientID, authTokenSecret)
 	if err != nil {
 		http.Error(w, "Error generating token", http.StatusInternalServerError)
 		return
 	}
 
 	// Log token issuance
-	commonutils.auditLog(fmt.Sprintf("Token issued to client_id: %s at %s", clientID, time.Now().Format(time.RFC3339)))
+	audit.AuditLog(fmt.Sprintf("Token issued to client_id: %s at %s", clientID, time.Now().Format(time.RFC3339)))
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -78,7 +80,7 @@ func tokenHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // Function to handle HTTP token authentication
-func tokenAuthMiddleware(next http.Handler) http.Handler {
+func TokenAuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
@@ -117,7 +119,7 @@ func tokenAuthMiddleware(next http.Handler) http.Handler {
 		}
 
 		// Log access to a protected route
-		commonutils.auditLog(fmt.Sprintf("Route accessed: %s by client_id: %s at %s", r.URL.Path, claims.ClientID, time.Now().Format(time.RFC3339)))
+		audit.AuditLog(fmt.Sprintf("Route accessed: %s by client_id: %s at %s", r.URL.Path, claims.ClientID, time.Now().Format(time.RFC3339)))
 
 		next.ServeHTTP(w, r)
 	})

@@ -1,4 +1,4 @@
-package commonutils
+package helpers
 
 import (
 	"encoding/json"
@@ -6,7 +6,7 @@ import (
 )
 
 // removeDuplicates removes duplicate values from a slice
-func removeDuplicatesFromSlice(slice []string) []string {
+func RemoveDuplicatesFromSlice(slice []string) []string {
 	seen := make(map[string]struct{})
 	uniqueSlice := []string{}
 
@@ -21,7 +21,7 @@ func removeDuplicatesFromSlice(slice []string) []string {
 }
 
 // Function to convert multi-line string to JSON object
-func multiLineStringToJSON(input string) (string, error) {
+func MultiLineStringToJSON(input string) (string, error) {
 	// Split the input string by newlines to create a slice of strings
 	lines := strings.Split(strings.TrimSpace(input), "\n")
 
@@ -40,7 +40,7 @@ func multiLineStringToJSON(input string) (string, error) {
 }
 
 // Function to convert a []string to a JSON object
-func stringArrayToJSON(input []string) (string, error) {
+func StringArrayToJSON(input []string) (string, error) {
 	// Create a map with the key "response" and value as the input slice
 	jsonObject := map[string][]string{
 		"response": input,

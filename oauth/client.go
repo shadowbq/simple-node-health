@@ -7,15 +7,15 @@ import (
 	"log"
 	"time"
 
-	_ "github.com/shadowbq/simple-node-health/commonutils"
+	"github.com/shadowbq/simple-node-health/audit"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-// createClientCmd returns a Cobra command for creating a new client
-func createClientCmd() *cobra.Command {
+// CreateClientInternalCmd returns a Cobra command for creating a new client
+func CreateClientInternalCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "create-client",
+		Use:   "create-client-internal",
 		Short: "Create a new client_id and client_secret and append them to the config file",
 		Run: func(cmd *cobra.Command, args []string) {
 			clientID, clientSecret := generateClientCredentials()
@@ -70,5 +70,5 @@ func appendClientCredentials(clientID, clientSecret string) {
 	fmt.Printf("New client_id and client_secret added:\nclient_id: %s\nclient_secret: %s\n", clientID, clientSecret)
 
 	// Log the new client creation
-	commonutils.auditLog(fmt.Sprintf("New client created: client_id: %s at %s", clientID, time.Now().Format(time.RFC3339)))
+	audit.AuditLog(fmt.Sprintf("New client created: client_id: %s at %s", clientID, time.Now().Format(time.RFC3339)))
 }

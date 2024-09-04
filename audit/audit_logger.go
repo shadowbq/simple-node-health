@@ -1,4 +1,4 @@
-package commonutils
+package audit
 
 import (
 	"log"
@@ -6,18 +6,18 @@ import (
 )
 
 // Create a logger
-var auditLogger *log.Logger
+var AuditLogger *log.Logger
 
 // Log a message to the audit log
-func auditLog(message string) {
-	auditLogger.Println(message)
+func AuditLog(message string) {
+	AuditLogger.Println(message)
 }
 
-func initAuditLogger() {
+func InitAuditLogger() {
 	file, err := os.OpenFile("audit.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		log.Fatalf("Failed to open audit log file: %v", err)
 	}
 
-	auditLogger = log.New(file, "", log.LstdFlags)
+	AuditLogger = log.New(file, "", log.LstdFlags)
 }
