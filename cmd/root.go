@@ -6,9 +6,7 @@ import (
 
 	"github.com/shadowbq/simple-node-health/audit"
 	"github.com/shadowbq/simple-node-health/oauth"
-	_ "github.com/shadowbq/simple-node-health/oauth"
 	"github.com/shadowbq/simple-node-health/parsers"
-	_ "github.com/shadowbq/simple-node-health/parsers"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

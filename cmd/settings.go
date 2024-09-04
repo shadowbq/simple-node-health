@@ -7,6 +7,21 @@ import (
 	"github.com/spf13/viper"
 )
 
+var (
+	Version string // set by the build process
+)
+
+var versionCmd = &cobra.Command{
+	Use:  "version",
+	Long: "Print the version number of simple-node-health",
+	Run: func(cmd *cobra.Command, args []string) {
+		if Version == "" {
+			Version = "development"
+		}
+		fmt.Println("simple-node-health version:", Version)
+	},
+}
+
 // settingsCmd represents the settings command
 var settingsCmd = &cobra.Command{
 	Use:   "settings",
@@ -50,5 +65,6 @@ var settingsCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(settingsCmd)
+	rootCmd.AddCommand(versionCmd)
 
 }
