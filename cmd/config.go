@@ -2,15 +2,20 @@ package cmd
 
 import (
 	"log"
+	"os"
 
-	"github.com/shadowbq/simple-node-health/oauth"
 	"github.com/spf13/viper"
 )
 
 var (
-	authTokenSecret string
-	clients         []oauth.Client
+	authTokenSecret   string
+	ClientsFromConfig []Client
 )
+
+type Client struct {
+	ClientID     string `mapstructure:"client_id"`
+	ClientSecret string `mapstructure:"client_secret"`
+}
 
 // Function to initialize the configuration for Viper
 func initConfig() {
@@ -25,10 +30,18 @@ func initConfig() {
 		log.Fatalf("Error reading config file: %v", err)
 	}
 
-	// Load client credentials
-	if err := viper.UnmarshalKey("clients", &clients); err != nil {
+	// Load client credentials into the Clients slice
+	if err := viper.UnmarshalKey("clients", &ClientsFromConfig); err != nil {
 		log.Fatalf("Error parsing client configuration: %v", err)
 	}
+
+	// log the clients size
+	log.Printf("Clients size from Config: %d", len(ClientsFromConfig))
+
+	if len(ClientsFromConfig) == 0 {
+		log.Printf("No clients found. fix: 'simple-node-health create-client'")
+		os.Exit(1)
+	} // Verbose logging
 
 	// Load token secret
 	authTokenSecret = viper.GetString("authTokenSecret")

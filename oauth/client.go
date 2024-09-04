@@ -1,3 +1,4 @@
+// Package oauth - client.go - The code in this file is used to create a new client_id and client_secret and append them to the configuration file.
 package oauth
 
 import (

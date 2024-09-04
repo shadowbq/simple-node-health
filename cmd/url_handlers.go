@@ -99,6 +99,7 @@ func initURLHandlers() {
 
 	unprotectedMux := NewRouteTrackingMux()
 	unprotectedMux.HandleFunc("/token", oauth.TokenHandler)
+	unprotectedMux.HandleFunc("/ready", parsers.HTTPCheckStatus)
 
 	mux := NewRouteTrackingMux()
 	mux.HandleFunc("/", parsers.HTTPCheckStatus)
@@ -111,6 +112,7 @@ func initURLHandlers() {
 	// Combine both muxes into a single handler
 	mainMux = NewRouteTrackingMux()
 	mainMux.Handle("/token", unprotectedMux)
+	mainMux.Handle("/ready", unprotectedMux)
 	mainMux.Handle("/", secureMux) // All other routes go through the secure mux
 
 	routes = append(mainMux.Routes(), unprotectedMux.Routes()...)
@@ -125,6 +127,7 @@ func initURLHandlers() {
 func runServer(port int) {
 	audit.AuditLog(fmt.Sprintf("Starting server on port %d...\n", port))
 	log.Printf("Starting server on port %d...\n", port)
+	log.Printf("Liveness check available at http://localhost:%d/ready\n", port)
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), mainMux); err != nil {
 		log.Fatalf("Server failed to start: %v", err)
 		os.Exit(1)
