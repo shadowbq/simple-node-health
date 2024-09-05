@@ -10,6 +10,7 @@ cat := $(if $(filter $(OS),Windows_NT),type,cat)
 PACKAGE_VERSION := $(shell $(cat) VERSION)
 VERSION := $(PACKAGE_VERSION)
 
+TARGET_DIR = build
 BUILD_DIR = support
 DEBIAN_DIR = $(BUILD_DIR)/DEBIAN
 CONTROL_TEMPLATE = $(DEBIAN_DIR)/control.tpl
@@ -34,8 +35,8 @@ build:
 	@echo
 	@echo "\033[32mBuilding ----> \033[m"
 	
-	env GOOS=linux GOARCH=amd64 go build -ldflags "$(GOLD_FLAGS) ${SILVER_FALGS}" -o build/simple-node-health_linux_amd64 main.go
-	env GOOS=darwin GOARCH=amd64 go build -ldflags "$(GOLD_FLAGS) ${SILVER_FALGS}" -o build/simple-node-health_darwin_amd64 main.go
+	env GOOS=linux GOARCH=amd64 go build -ldflags "$(GOLD_FLAGS) ${SILVER_FALGS}" -o $(TARGET_DIR)/simple-node-health_linux_amd64 main.go
+	env GOOS=darwin GOARCH=amd64 go build -ldflags "$(GOLD_FLAGS) ${SILVER_FALGS}" -o $(TARGET_DIR)/simple-node-health_darwin_amd64 main.go
 	
 
 clean:
@@ -53,13 +54,14 @@ depend:
 package:
 	@echo
 	@echo "\033[32mPackaging ----> \033[m"
-	cp build/simple-node-health_linux_amd64 support/usr/local/bin/simple-node-health
+	mkdir -p $(BUILD_DIR)/usr/local/bin/
+	cp $(TARGET_DIR)/simple-node-health_linux_amd64 $(BUILD_DIR)/usr/local/bin/simple-node-health
 	# Replace {{VERSION}} in the control template with the actual version
 	sed 's/{{VERSION}}/$(VERSION)/g' $(CONTROL_TEMPLATE) > $(CONTROL_FILE)
 	chmod 0644 $(CONTROL_FILE)
 	# Build the .deb package
 	dpkg-deb --build $(BUILD_DIR)
-	mv $(BUILD_DIR).deb build/$(PACKAGE_NAME)_$(VERSION)_amd64.deb
+	mv $(BUILD_DIR).deb $(TARGET_DIR)/$(PACKAGE_NAME)_$(VERSION)_amd64.deb
 
 ifndef PACKAGE_VERSION
 	@echo "\033[1;33mPACKAGE_VERSION is not set. In order to build a package I need PACKAGE_VERSION=n\033[m"
