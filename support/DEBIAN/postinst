@@ -7,15 +7,48 @@ if [ "$(id -u)" -ne 0 ]; then
   exit 1
 fi
 
-adduser --system --no-create-home --group snh
+USERNAME="snh"
 
-touch /var/log/snh.log
-chown snh:snh /var/log/snh.log
+# Check if the user already exists
+if id "$USERNAME" &>/dev/null; then
+    echo "User $USERNAME already exists. Skipping user creation."
+else
+    # Attempt to add the user and check for success
+    if adduser --system --no-create-home --group "$USERNAME"; then
+        echo "User $USERNAME created successfully."
+    else
+        echo "Failed to create user $USERNAME." >&2
+        exit 1
+    fi
+fi
 
-#Adding system user `snh' (UID 117) ...
-#Adding new group `snh' (GID 120) ...
-#Adding new user `snh' (UID 117) with group `snh' ...
-#Not creating home directory `/home/snh'.
+# Define the log file path
+LOGFILE="/var/log/snh.log"
+
+# Create the directory if it doesn't exist
+if mkdir -p /var/log; then
+    echo "Directory /var/log created or already exists."
+else
+    echo "Failed to create directory /var/log." >&2
+    exit 1
+fi
+
+# Create the log file
+if touch "$LOGFILE"; then
+    echo "Log file $LOGFILE created."
+else
+    echo "Failed to create log file $LOGFILE." >&2
+    exit 1
+fi
+
+# Change the owner of the log file
+if chown "$USERNAME":"$USERNAME" "$LOGFILE"; then
+    echo "Ownership of $LOGFILE changed to $USERNAME:$USERNAME."
+else
+    echo "Failed to change ownership of $LOGFILE." >&2
+    exit 1
+fi
+
 
 # Enable and start the service
 systemctl daemon-reload
