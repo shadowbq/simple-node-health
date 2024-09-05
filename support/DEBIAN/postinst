@@ -35,7 +35,7 @@ fi
 
 # Create the log file
 if touch "$LOGFILE"; then
-    echo "Log file $LOGFILE created."
+    echo "Log file $LOGFILE created/updated."
 else
     echo "Failed to create log file $LOGFILE." >&2
     exit 1
