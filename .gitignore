@@ -25,6 +25,7 @@ _testmain.go
 /pkg/
 
 support/DEBIAN/control
+support/usr/local/bin/simple-node-health
 
 tmp
 locallog.txt

@@ -5,9 +5,11 @@
 
 The `simple-node-health` tool is a versatile Go-based utility designed to monitor the health of Linux systems by providing an easy-to-use HTTP server and command-line interface. It performs essential checks, such as monitoring EXT4 file systems for read-only status, conducting DNS queries, and reporting the overall status of the node. This tool is best utilized when coupled with monitoring tools like Uptime Kuma or other systems that can monitor states via web calls, allowing users to integrate these health checks into their broader monitoring setups and ensure real-time visibility into server performance and stability in production environments.
 
+The web routes are protected with an OAUTH `bearer` issued via `form:client_id` `form:client_secret` `token` method.
+
 ## Dev Prerequisites
 
-* Golang
+* Golang 1.22
 
 ## Usage
 
@@ -26,6 +28,7 @@ Available Commands:
   help          Help about any command
   settings      Print the current configuration settings
   show-routes   Show all registered HTTP routes
+  version
 
 Flags:
   -d, --domain string   Domain to query with dig (default "cloudflare.com")
@@ -57,9 +60,27 @@ Run the DNS example
 }
 ```
 
+## Liveliness Check
+
+The `/ready` endpoint can be used to check for liveliness of the web application. (It does not need authentication)
+
+```shell
+$> curl http://localhost:8080/ready
+{"status":"ok"}
+```
+
 ## Web OAUTH2 Tokens
 
 This web application is designed to be used with OAUTH2 tokens. It has a built-in token request endpoint and a token check endpoint. The `/token` request endpoint can be used to request a token with a `client_id` and `client_secret`. 
+
+Use the CLI to create new clients 
+
+```shell
+$> simple-node-health create-client
+New client_id and client_secret added:
+client_id: 0ea7386e827d0a33
+client_secret: f72029251b56cf0b730e989f1af77c03
+```
 
 The token `/check` endpoint can be used to check the validity of the token. Use the header `Authorization: Bearer <access_token>` when make calls to any of the secured endpoints. 
 
@@ -91,22 +112,26 @@ Self document the URL routes that are available
 
 ```json
 $> ./simple-node-health show-routes
+./build/simple-node-health_darwin_amd64 show-routes
+2024/09/04 16:32:26 Clients size from Config: 5
 {
   "routes": [
     "/",
     "/check",
     "/check/disks",
     "/check/dns",
+    "/ready",
     "/token"
   ]
 }
 ```
 
+
+
 ## Build
 
 ```shell
-make
-Product Version 1.5.0
+Product Version 2.0.0
 
 Checking Build Dependencies ---->
 
@@ -117,18 +142,18 @@ rm -f -rf tmp/*
 rm -f -rf support/usr/local/bin/*
 
 Building ---->
-env GOOS=linux GOARCH=amd64 go build -ldflags "-X github.com/shadowbq/simple-node-health/cmd.Version=1.0.2 " -o build/simple-node-health_linux_amd64 main.go
-env GOOS=darwin GOARCH=amd64 go build -ldflags "-X github.com/shadowbq/simple-node-health/cmd.Version=1.0.2 " -o build/simple-node-health_darwin_amd64 main.go
+env GOOS=linux GOARCH=amd64 go build -ldflags "-X github.com/shadowbq/simple-node-health/cmd.Version=2.0.0 " -o build/simple-node-health_linux_amd64 main.go
+env GOOS=darwin GOARCH=amd64 go build -ldflags "-X github.com/shadowbq/simple-node-health/cmd.Version=2.0.0 " -o build/simple-node-health_darwin_amd64 main.go
 
 Packaging ---->
 cp build/simple-node-health_linux_amd64 support/usr/local/bin/simple-node-health
 # Replace {{VERSION}} in the control template with the actual version
-sed 's/{{VERSION}}/1.0.2/g' support/DEBIAN/control.tpl > support/DEBIAN/control
+sed 's/{{VERSION}}/2.0.0/g' support/DEBIAN/control.tpl > support/DEBIAN/control
 chmod 0644 support/DEBIAN/control
 # Build the .deb package
 dpkg-deb --build support
 dpkg-deb: building package 'simple-node-health' in 'support.deb'.
-mv support.deb build/simple-node-health_1.0.2_amd64.deb
+mv support.deb build/simple-node-health_2.0.0_amd64.deb
 ```
 
 ## Support - Running as a Service
