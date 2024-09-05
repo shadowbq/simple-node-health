@@ -39,8 +39,15 @@ func initConfig() {
 	log.Printf("Clients size from Config: %d", len(ClientsFromConfig))
 
 	if len(ClientsFromConfig) == 0 {
-		log.Printf("No clients found. fix: 'simple-node-health create-client'")
-		os.Exit(1)
+		log.Printf("No clients found. ")
+
+		// Check if insecure mode is enabled in the config
+		if viper.GetBool("insecure") {
+			log.Println("Insecure mode enabled. No client credentials required.")
+		} else {
+			log.Println("Either enable insecure mode, or run: 'simple-node-health create-client'")
+			os.Exit(1)
+		}
 	} // Verbose logging
 
 	// Load token secret

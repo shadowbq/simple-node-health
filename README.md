@@ -39,6 +39,31 @@ Flags:
 Use "simple-node-health [command] --help" for more information about a command.
 ```
 
+## Configuration
+
+- **`snh-config.yaml`**: Example secure configuration for OAUTH2 web use.
+
+```yaml
+authtokensecret: change-my-s3cr3t-auth
+clients:
+    - client_id: 0ea7386e827d0a33
+      client_secret: f72029251b56cf0b730e989f1af77c03
+domain: cloudflare.com
+port: 8080
+verbose: false
+```
+
+- **`snh-config.yaml`**: Example insecure configuration with no webusers.
+
+```yaml
+insecure: true
+domain: cloudflare.com
+port: 8080
+verbose: false
+```
+
+## Sub Command Usage
+
 Inspect its default settings
 
 ```shell
@@ -157,6 +182,18 @@ mv support.deb build/simple-node-health_2.0.0_amd64.deb
 ```
 
 ## Support - Running as a Service
+
+LightWeight Checking by default
+
+### `snh.service` Explanation:
+
+-   **`Environment=GOMAXPROCS=1`**: Sets the Maximum Processes to only 1. This is ensure this stays a lightweight process on the endpoint.
+
+-   **`Nice=19`**: Sets the CPU scheduling priority of the service to the lowest level, meaning the process will have the least CPU priority compared to other processes.
+
+-   **`IOSchedulingClass=2`**: Sets the I/O scheduling class to `best-effort`.
+
+-   **`IOSchedulingPriority=7`**: Sets the I/O priority within the `best-effort` class to the lowest level.
 
 ### Step 1: Copy binary and service files
 

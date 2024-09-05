@@ -16,7 +16,13 @@ func AuditLog(message string) {
 func InitAuditLogger() {
 	file, err := os.OpenFile("/var/log/snh.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
-		log.Fatalf("Failed to open audit log file: %v", err)
+		log.Printf("Failed to open system snh audit log file: %v", err)
+		// try logging to pwd
+		file, err = os.OpenFile("snh.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if err != nil {
+
+			log.Fatalf("Failed to open snh audit log file: %v", err)
+		}
 	}
 
 	AuditLogger = log.New(file, "", log.LstdFlags)

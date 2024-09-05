@@ -3,6 +3,10 @@ Description=Simple Node Health Service
 After=network.target
 
 [Service]
+Environment=GOMAXPROCS=1
+Nice=19
+IOSchedulingClass=2
+IOSchedulingPriority=7
 Type=simple
 ExecStart=/usr/local/bin/simple-node-health
 Restart=on-failure

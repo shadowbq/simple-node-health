@@ -13,6 +13,7 @@ import (
 	"github.com/shadowbq/simple-node-health/oauth"
 	"github.com/shadowbq/simple-node-health/parsers"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var (
@@ -97,26 +98,46 @@ func showRoutesCmd() *cobra.Command {
 // Start the web server with configurable port
 func initURLHandlers() {
 
+	// Default unprotected routes
 	unprotectedMux := NewRouteTrackingMux()
 	unprotectedMux.HandleFunc("/token", oauth.TokenHandler)
 	unprotectedMux.HandleFunc("/ready", parsers.HTTPCheckStatus)
 
-	mux := NewRouteTrackingMux()
-	mux.HandleFunc("/", parsers.HTTPCheckStatus)
-	mux.HandleFunc("/check", parsers.HTTPCheckStatus)
-	mux.HandleFunc("/check/disks", parsers.HTTPCheckDisks)
-	mux.HandleFunc("/check/dns", parsers.HTTPCheckDNS)
+	// Check if insecure mode is enabled in the config
+	if viper.GetBool("insecure") {
+		log.Println("NOTICE: Insecure mode enabled. Loading protected routes on insecure route handler.")
 
-	secureMux := oauth.TokenAuthMiddleware(mux)
+		// Unprotected routes due to insecure mode
+		unprotectedMux.HandleFunc("/", parsers.HTTPCheckStatus)
+		unprotectedMux.HandleFunc("/check", parsers.HTTPCheckStatus)
+		unprotectedMux.HandleFunc("/check/disks", parsers.HTTPCheckDisks)
+		unprotectedMux.HandleFunc("/check/dns", parsers.HTTPCheckDNS)
 
-	// Combine both muxes into a single handler
-	mainMux = NewRouteTrackingMux()
-	mainMux.Handle("/token", unprotectedMux)
-	mainMux.Handle("/ready", unprotectedMux)
-	mainMux.Handle("/", secureMux) // All other routes go through the secure mux
+		mainMux = unprotectedMux
 
-	routes = append(mainMux.Routes(), unprotectedMux.Routes()...)
-	routes = append(routes, mux.Routes()...)
+		routes = append(unprotectedMux.Routes())
+
+	} else {
+
+		// Protected routes
+		mux := NewRouteTrackingMux()
+		mux.HandleFunc("/", parsers.HTTPCheckStatus)
+		mux.HandleFunc("/check", parsers.HTTPCheckStatus)
+		mux.HandleFunc("/check/disks", parsers.HTTPCheckDisks)
+		mux.HandleFunc("/check/dns", parsers.HTTPCheckDNS)
+
+		secureMux := oauth.TokenAuthMiddleware(mux)
+
+		// Combine both muxes into a single handler
+		mainMux = NewRouteTrackingMux()
+		mainMux.Handle("/token", unprotectedMux)
+		mainMux.Handle("/ready", unprotectedMux)
+		mainMux.Handle("/", secureMux) // All other routes go through the secure mux
+
+		routes = append(mainMux.Routes(), unprotectedMux.Routes()...)
+		routes = append(routes, mux.Routes()...)
+	}
+
 	if len(routes) == 0 {
 		fmt.Println("No routes registered.")
 		return
