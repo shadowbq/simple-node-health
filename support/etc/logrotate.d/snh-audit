@@ -1,0 +1,9 @@
+/var/log/snh-audit.log {
+    size 10M
+    rotate 5
+    compress
+    missingok
+    notifempty
+    copytruncate
+    create 0640 snh snh
+}

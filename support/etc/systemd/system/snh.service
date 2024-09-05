@@ -4,12 +4,10 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/simple-node-health --port 8080 --domain cloudflare.com
+ExecStart=/usr/local/bin/simple-node-health
 Restart=on-failure
-User=nobody
-Group=nogroup
-Environment=PORT=8080
-Environment=DOMAIN=cloudflare.com
+User=snh
+Group=snh
 
 [Install]
 WantedBy=multi-user.target

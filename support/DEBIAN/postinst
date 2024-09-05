@@ -7,6 +7,16 @@ if [ "$(id -u)" -ne 0 ]; then
   exit 1
 fi
 
+adduser --system --no-create-home --group snh
+
+touch /var/log/snh.log
+chown snh:snh /var/log/snh.log
+
+#Adding system user `snh' (UID 117) ...
+#Adding new group `snh' (GID 120) ...
+#Adding new user `snh' (UID 117) with group `snh' ...
+#Not creating home directory `/home/snh'.
+
 # Enable and start the service
 systemctl daemon-reload
 systemctl enable snh.service

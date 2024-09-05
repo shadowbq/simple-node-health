@@ -7,6 +7,9 @@ if [ "$(id -u)" -ne 0 ]; then
   exit 1
 fi
 
+# Remove the user and group
+deluser --system snh || true
+
 # Stop and disable the service
 systemctl stop ext4_check.service || true
 systemctl disable ext4_check.service || true
