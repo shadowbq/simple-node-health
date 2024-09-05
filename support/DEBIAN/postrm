@@ -1,0 +1,11 @@
+#!/bin/bash
+set -e
+
+# Change the owner of the log file to root now that the user has been removed
+chown -R root:root /var/log/snh.log* || true
+
+USERNAME="snh"
+
+# Remove the user and group
+deluser --system "$USERNAME" || true
+
