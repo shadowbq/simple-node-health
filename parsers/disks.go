@@ -1,7 +1,6 @@
 package parsers
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"os/exec"
@@ -39,19 +38,20 @@ func getDisks() (string, error) {
 		return "", fmt.Errorf("Error: %v", err)
 	}
 
-	return jsonOutput, nil
+	return string(jsonOutput), nil
 }
 
 // Function to check for EXT4 devices in read-only mode
 func HTTPCheckDisks(w http.ResponseWriter, r *http.Request) {
-	results, err := getDisks()
+	result, err := getDisks()
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error checking disks: %v\n", err), http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(results)
+	//json.NewEncoder(w).Encode(results)
+	fmt.Fprintln(w, result)
 }
 
 // Function to print check disks to console
